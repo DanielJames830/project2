@@ -1,5 +1,5 @@
 <template>
-  <div class="sign-in-page">
+  <div class="page">
     <p>Welcome to</p>
     <h1><span class="brand">Excursions.</span></h1>
     <div class="sign-in-container">
@@ -62,7 +62,7 @@ export default {
     };
 
     const onJoin = () => {
-      console.log('Join button clicked');
+      router.push({ name: 'join' });
     };
 
     return { email, password, onSubmit, onJoin };
@@ -71,16 +71,6 @@ export default {
 </script>
 
 <style scoped>
-.sign-in-page {
-  background: linear-gradient(135deg, #6985af, #476593);
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
-}
-
 p {
   font-size: 2rem;
   color: white;
@@ -119,22 +109,6 @@ form {
   text-align: left;
 }
 
-.input-group label {
-  display: block;
-  margin-bottom: 0.25rem;
-  font-size: 0.9rem;
-  color: #21272A;
-}
-
-.input-group input {
-  width: 100%;
-  padding: 0.5rem;
-  font-size: 1.2rem;
-  border: none;
-  border-radius: 0.5rem;
-  background-color: #f2f4f8;
-  color: #697077;
-}
 
 .buttons {
   display: flex;

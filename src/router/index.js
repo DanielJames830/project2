@@ -1,11 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import Home from '@/views/Home.vue';
 import SignIn from '@/views/SignIn.vue';
 import Join from '@/views/Join.vue';
 import MainView from '@/views/MainView.vue';
 import { useUserStore } from '@/stores/user';
 import Excursions from '@/views/Excursions.vue';
 import Profile from '@/views/Profile.vue';
+import TitleBar from '@/components/TitleBar.vue';
 
 const isAuthenticated = () => {
   const userStore = useUserStore();

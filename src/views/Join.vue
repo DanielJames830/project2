@@ -1,6 +1,6 @@
 <!-- eslint-disable vue/multi-word-component-names -->
 <template>
-  <div class="join-page">
+  <div class="page">
     <p>welcome to</p>
     <h1><span class="brand">excursions.</span></h1>
     <div class="join-container">
