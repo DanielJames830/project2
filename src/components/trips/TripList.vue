@@ -26,8 +26,7 @@ import { useUserStore } from '@/stores/user';
 const userStore = useUserStore();
 const token = userStore.token;
 
-const trips = ref([]);
-const selectedTrip = ref(null);
+
 const showNewTripModal = ref(false);
 const newTrip = ref({
     name: '',
@@ -55,11 +54,14 @@ async function getTrips() {
     return data;
 }
 
+const trips = ref([]);
+const selectedTrip = ref(null);
+
 async function fetchTrips() {
     const data = await getTrips();
-
+    console.log('Fetched trips:', JSON.stringify(data));
     if (data) {
-        trips.value = data['trips'];
+        trips.value = data;
     }
 
 }
