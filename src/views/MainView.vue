@@ -14,6 +14,6 @@
 
 <script setup>
 import BottomNavigation from '@/components/BottomNavigation.vue';
-import TitleBar from '@/components/TitleBar.vue';
+
 
 </script>
