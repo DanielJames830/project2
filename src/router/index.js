@@ -3,9 +3,8 @@ import SignIn from '@/views/SignIn.vue';
 import Join from '@/views/Join.vue';
 import MainView from '@/views/MainView.vue';
 import { useUserStore } from '@/stores/user';
-import Excursions from '@/views/Excursions.vue';
 import Profile from '@/views/Profile.vue';
-import TitleBar from '@/components/TitleBar.vue';
+import ExcursionList from '@/components/excursions/ExcursionList.vue';
 
 const isAuthenticated = () => {
   const userStore = useUserStore();
@@ -44,14 +43,14 @@ const router = createRouter({
           path: "",
           name: "main",
           components: {
-            focus: Excursions,
+            focus: ExcursionList,
           }
         },
         {
           path: "/excursions",
           name: "excursions",
           components: {
-            focus: Excursions,
+            focus: ExcursionList,
           },
           meta: { authRequired: true },
         },
