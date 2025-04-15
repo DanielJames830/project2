@@ -51,7 +51,7 @@ async function getTrips() {
 
     const data = await response.json();
 
-    return data;
+    return data.trips;
 }
 
 const trips = ref([]);

@@ -88,7 +88,7 @@ async function getUser() {
     }
 
     console.log("Found User:", responseData);
-    user.value = responseData;
+    user.value = responseData.user;
     console.log(user.value)
 
   } catch (error) {

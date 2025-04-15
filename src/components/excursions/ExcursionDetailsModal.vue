@@ -14,10 +14,9 @@
             </div>
 
             <h3>Trips</h3>
-            <div class="trip-list">
-                <TripCard v-for="(trip, index) in editableExcursion.trips" :key="trip.id || index" :trip="trip"
-                    :is-editing="isEditing" @remove="removeTrip(index)" />
-            </div>
+            <multiselect id="multiselect" v-model="value" :options="options" :multiple="true" :close-on-select="false" :clear-on-select="false"
+                 :preserve-search="true" placeholder="Pick some" label="name" track-by="name" :preselect-first="true"></multiselect>
+
 
             <div class="modal-actions">
                 <!-- For existing excursions: show edit/save and delete options -->
@@ -35,9 +34,10 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { onMounted, ref, watch } from 'vue';
 import TripCard from '../trips/TripCard.vue';
 import { useUserStore } from '@/stores/user';
+import Multiselect from 'vue-multiselect'
 
 const props = defineProps({
     excursion: {
@@ -58,6 +58,19 @@ const editableExcursion = ref({ ...props.excursion });
 const userStore = useUserStore();
 const token = userStore.token;
 
+const value = ref("test");
+const options = ref([
+    { name: 'Trip 1', id: 1 },
+    { name: 'Trip 2', id: 2 },
+    { name: 'Trip 3', id: 3 }
+]);
+
+onMounted(async () => {
+    if (props.excursion.trips.length === 0) {
+        const trips = await getTrips();
+        editableExcursion.value.trips = trips;
+    }
+});
 
 watch(
     () => props.excursion,
@@ -141,6 +154,29 @@ async function saveChanges() {
 function removeTrip(index) {
     editableExcursion.value.trips.splice(index, 1);
 }
+
+async function getTrips() {
+    const url = "https://excursions-api-server.azurewebsites.net/trips";
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`
+        }
+    });
+
+    if (!response.ok) {
+        console.error('Error fetching trips:', response.statusText);
+        return;
+    }
+
+    const data = await response.json();
+    options.value = data.trips.map(trip => ({
+        name: trip.name,
+        id: trip._id
+    }));
+    return data.trips;
+}
 </script>
 
 <style scoped>
@@ -173,5 +209,9 @@ function removeTrip(index) {
 
 .trip-list {
     margin-top: 1rem;
+    max-height: 300px;
+    overflow-y: auto;
 }
 </style>
+
+<style src="vue-multiselect/dist/vue-multiselect.min.css"></style>
