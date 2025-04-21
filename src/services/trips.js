@@ -1,9 +1,9 @@
 import { useUserStore } from '@/stores/user';
 
-const userStore = useUserStore();
-const token = userStore.token;
-
 export async function createTrip(tripData) {
+    const userStore = useUserStore();
+    const token = userStore.token;
+
     const url = "https://excursions-api-server.azurewebsites.net/trip";
 
     const payload = {
@@ -29,6 +29,75 @@ export async function createTrip(tripData) {
         const errorData = await response.json();
         console.error('Error creating trip:', errorData.message || response.statusText);
         throw new Error(errorData.message || 'Failed to create trip');
+    }
+
+    return await response.json();
+}
+
+export async function fetchTrips() {
+    const userStore = useUserStore();
+    const token = userStore.token;
+
+    const url = 'https://excursions-api-server.azurewebsites.net/trips';
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch trips');
+    }
+
+    return await response.json();
+}
+
+export async function fetchTripById(tripId) {
+    const userStore = useUserStore();
+    const token = userStore.token;
+
+    const url = `https://excursions-api-server.azurewebsites.net/trip/${tripId}`;
+    const response = await fetch(url, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to fetch trip by ID');
+    }
+
+    return await response.json();
+}
+
+export async function updateTripById(tripId, tripData) {
+    const userStore = useUserStore();
+    const token = userStore.token;
+
+    const url = `https://excursions-api-server.azurewebsites.net/trip/${tripId}`;
+    const response = await fetch(url, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(tripData),
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to update trip');
+    }
+
+    return await response.json();
+}
+
+export async function deleteTripById(tripId) {
+    const userStore = useUserStore();
+    const token = userStore.token;
+
+    const url = `https://excursions-api-server.azurewebsites.net/trip/${tripId}`;
+    const response = await fetch(url, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    });
+
+    if (!response.ok) {
+        throw new Error('Failed to delete trip');
     }
 
     return await response.json();

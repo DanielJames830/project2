@@ -32,10 +32,10 @@
 </template>
 
 <script setup>
-import { ref, onMounted, useTemplateRef } from 'vue';
+import { ref, onMounted, useTemplateRef, reactive } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
-import { fetchUser, deleteUser } from '@/services/users';
+import { fetchUser, deleteUser, updateUser } from '@/services/users';
 import EditForm from '@/components/EditForm.vue';
 import TitleBar from '@/components/TitleBar.vue';
 
@@ -44,6 +44,13 @@ const userStore = useUserStore();
 const nameDialog = ref(null);
 const form = useTemplateRef('form');
 const user = ref(null);
+
+const formData = reactive({
+  firstName: '',
+  lastName: '',
+  userName: '',
+  email: ''
+});
 
 async function getUser() {
   try {
@@ -61,6 +68,32 @@ async function handleDeleteUser() {
     router.push({ name: 'home' });
   } catch (error) {
     alert('Unable to delete account');
+  }
+}
+
+function openDialog() {
+  if (nameDialog.value) {
+    formData.firstName = user.value.firstName;
+    formData.lastName = user.value.lastName;
+    formData.userName = user.value.userName;
+    formData.email = user.value.email;
+    nameDialog.value.showModal();
+  }
+}
+
+async function save() {
+  try {
+    await updateUser(formData);
+    user.value = { ...user.value, ...formData };
+    nameDialog.value.close();
+  } catch (error) {
+    console.error('Error updating user:', error.message);
+  }
+}
+
+function cancel() {
+  if (nameDialog.value) {
+    nameDialog.value.close();
   }
 }
 

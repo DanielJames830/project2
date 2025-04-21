@@ -15,11 +15,4 @@ defineProps({
 });
 </script>
 
-<style scoped>
-.excursion-item {
-    border: 1px solid #ccc;
-    padding: 1rem;
-    border-radius: 10px;
-    margin-bottom: 1rem;
-}
-</style>
+<style scoped></style>

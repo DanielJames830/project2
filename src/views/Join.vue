@@ -4,7 +4,7 @@
     <p>welcome to</p>
     <h1><span class="brand">excursions.</span></h1>
     <div class="join-container">
-      <h2>Sign In</h2>
+      <h2>Join</h2>
       <form @submit.prevent="join">
         <div class="input-group">
           <label for="email">Email</label>
@@ -46,6 +46,7 @@
 import { useUserStore } from '@/stores/user';
 import { ref, reactive } from 'vue';
 import { useRouter } from 'vue-router';
+import { signIn, signUp, updateUser } from '@/services/users';
 
 export default {
   setup() {
@@ -65,28 +66,14 @@ export default {
     async function join() {
       errorMessage.value = '';
 
-      // Validate email format
       const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
       if (!emailPattern.test(formData.email)) {
         errorMessage.value = 'Please enter a valid email address.';
         return;
       }
 
-      const url = 'https://excursions-api-server.azurewebsites.net/user';
-      const options = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      };
-
       try {
-        const response = await fetch(url, options);
-        const responseData = await response.json();
-
-        if (!response.ok) {
-          errorMessage.value = responseData.message || 'An error occurred.';
-          return;
-        }
+        const responseData = await signUp(formData);
 
         userStore.$patch({
           email: responseData.email,
@@ -99,7 +86,7 @@ export default {
         router.push({ name: 'excursions' });
       } catch (error) {
         console.error('Error during sign-up:', error);
-        errorMessage.value = 'There has been an error joining.';
+        errorMessage.value = error.message || 'There has been an error joining.';
       }
     }
 
