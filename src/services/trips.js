@@ -1,20 +1,29 @@
 import { useUserStore } from '@/stores/user';
 
 export async function createTrip(tripData) {
+
+    const data = {
+        name: tripData.name,
+        description: tripData.description,
+        startDate: tripData.startDate,
+        endDate: tripData.endDate,
+        park: tripData.park.id,
+        thingstodo: tripData.thingstodo?.map(item => item.id) || []
+    };
+
+    if (tripData.campground) {
+        data.campground = tripData.campground.id;
+    }
+
+    console.log(JSON.stringify(data));
+
+
     const userStore = useUserStore();
     const token = userStore.token;
 
     const url = "https://excursions-api-server.azurewebsites.net/trip";
 
-    const payload = {
-        name: tripData.name,
-        description: tripData.description,
-        startDate: tripData.startDate,
-        endDate: tripData.endDate,
-        park: tripData.park,
-        campground: tripData.campground,
-        thingstodo: tripData.thingstodo || []
-    };
+
 
     const response = await fetch(url, {
         method: 'POST',
@@ -22,7 +31,7 @@ export async function createTrip(tripData) {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(payload)
+        body: JSON.stringify(data)
     });
 
     if (!response.ok) {

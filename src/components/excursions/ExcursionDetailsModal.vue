@@ -14,8 +14,9 @@
             </div>
 
             <h3>Trips</h3>
-            <multiselect id="multiselect" v-model="value" :options="options" :multiple="true" :close-on-select="false" :clear-on-select="false"
-                 :preserve-search="true" placeholder="Pick some" label="name" track-by="name" :preselect-first="true"></multiselect>
+            <multiselect id="multiselect" v-model="value" :options="options" :multiple="true" :close-on-select="false"
+                :clear-on-select="false" :preserve-search="true" placeholder="Pick some" label="name" track-by="name"
+                :preselect-first="true"></multiselect>
 
 
             <div class="modal-actions">
@@ -35,9 +36,10 @@
 
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import TripCard from '../trips/TripCard.vue';
+
 import { useUserStore } from '@/stores/user';
 import Multiselect from 'vue-multiselect'
+import { deleteExcursionById } from '@/services/excursions';
 
 const props = defineProps({
     excursion: {
@@ -84,20 +86,7 @@ function enableEditing() {
 }
 
 async function deleteExcursion() {
-    const url = `https://excursions-api-server.azurewebsites.net/excursion/${props.excursion._id}`;
-    const options = {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    };
-
-    const response = await fetch(url, options);
-    if (!response.ok) {
-        console.error('Error deleting excursion:', response.statusText);
-        return;
-    }
+    await deleteExcursionById(props.excursion._id);
 
     emit('delete');
 }

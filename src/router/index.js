@@ -5,7 +5,7 @@ import MainView from '@/views/MainView.vue';
 import { useUserStore } from '@/stores/user';
 import Profile from '@/views/Profile.vue';
 import ExcursionList from '@/components/excursions/ExcursionList.vue';
-import TripList from '@/components/trips/TripList.vue';
+
 import Parks from '@/views/Parks.vue';
 
 const isAuthenticated = () => {
@@ -64,14 +64,7 @@ const router = createRouter({
           },
           meta: { authRequired: true },
         },
-        {
-          path: "/trips",
-          name: "trips",
-          components: {
-            focus: TripList,
-          },
-          meta: { authRequired: true },
-        },
+
         {
           path: "/profile",
           name: "profile",

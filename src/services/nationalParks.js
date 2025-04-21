@@ -71,14 +71,13 @@ export async function fetchParkCodes() {
     return await response.json();
 }
 
-export async function fetchCampgrounds(query = '') {
+export async function fetchCampgrounds(parkCode) {
+    console.log('Fetching campgrounds for park code:', parkCode);
     const userStore = useUserStore();
     const token = userStore.token;
 
-    const url = new URL('https://excursions-api-server.azurewebsites.net/campgrounds');
-    if (query) {
-        url.searchParams.append('q', query);
-    }
+    const url = new URL('https://excursions-api-server.azurewebsites.net/campgrounds?parkCode=' + parkCode + '&limit=100');
+
 
     const response = await fetch(url, {
         method: 'GET',
@@ -95,14 +94,13 @@ export async function fetchCampgrounds(query = '') {
     return await response.json();
 }
 
-export async function fetchThingsToDo(query = '') {
+export async function fetchThingsToDo(parkCode) {
     const userStore = useUserStore();
     const token = userStore.token;
 
-    const url = new URL('https://excursions-api-server.azurewebsites.net/things-to-do');
-    if (query) {
-        url.searchParams.append('q', query);
-    }
+    const url = new URL('https://excursions-api-server.azurewebsites.net/things-to-do?limit=100&parkCode=' + parkCode);
+    console.log('Fetching things to do for park code:', parkCode);
+
 
     const response = await fetch(url, {
         method: 'GET',

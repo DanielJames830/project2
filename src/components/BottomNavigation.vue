@@ -33,7 +33,7 @@
 .bottom-nav {
   position: fixed;
   height: 80px;
-  /* Set a fixed height */
+
   bottom: 0;
   left: 0;
   width: 100%;
@@ -43,7 +43,7 @@
   padding: 10px 0;
   box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  /* Ensure it stays above other content */
+
 }
 
 .nav-item {

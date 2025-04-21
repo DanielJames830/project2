@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <TitleBar title="Profile" subtitle="View and edit your profile" />
+
     <div class="profile-container">
       <div class="profile-body">
         <h1 v-if="user"> {{ user.firstName }} {{ user.lastName }}</h1>

@@ -1,21 +1,19 @@
 <template>
-    <div class="page">
-        <TitleBar title="Excursions" subtitle="View and edit your profile" />
-        <button class="floating-action-button" @click="openNewExcursionModal">+</button>
-        <div class="container">
-            <h1>Excursions</h1>
-            <p>Explore the world with us!</p>
-            <div class="excursion-list">
-                <ExcursionItem v-for="excursion in excursions" :key="excursion.id" :excursion="excursion"
-                    @view-details="openExcursionDetails" />
-            </div>
+    <button class="floating-action-button" @click="openNewExcursionModal">+</button>
+    <div class="container">
+        <h1>Excursions</h1>
+        <p>Explore the world with us!</p>
+        <div class="excursion-list">
+            <ExcursionItem v-for="excursion in excursions" :key="excursion.id" :excursion="excursion"
+                @view-details="openExcursionDetails" />
         </div>
-        <ExcursionDetailsModal v-if="selectedExcursion" :excursion="selectedExcursion" @close="selectedExcursion = null"
-            @update="updateExcursion" @delete="deleteExcursion" />
-
-        <ExcursionDetailsModal v-if="showNewExcursionModal" :excursion="newExcursion" new
-            @close="closeNewExcursionModal" @update="createdExcursion" />
     </div>
+    <ExcursionDetailsModal v-if="selectedExcursion" :excursion="selectedExcursion" @close="selectedExcursion = null"
+        @update="updateExcursion" @delete="deleteExcursion" />
+
+    <ExcursionDetailsModal v-if="showNewExcursionModal" :excursion="newExcursion" new @close="closeNewExcursionModal"
+        @update="createdExcursion" />
+
 </template>
 
 <script setup>

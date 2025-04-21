@@ -19,14 +19,13 @@ import BottomNavigation from '@/components/BottomNavigation.vue';
 
 <style scoped>
 .main-content {
-  flex: 1;
-  /* Ensure it takes up remaining space */
+
   width: 100%;
   overflow-y: auto;
-  /* Allow scrolling if content overflows */
-  padding-top: 60px;
-  /* Match TitleBar height */
+  max-height: calc(100vh - 80px);
+  padding-top: 30px;
+
   padding-bottom: 80px;
-  /* Match BottomNavigation height */
+
 }
 </style>

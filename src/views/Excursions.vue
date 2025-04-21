@@ -1,6 +1,5 @@
 <template>
   <div class="page">
-    <TitleBar title="Excursions" subtitle="View and edit your profile" />
 
     <button class="floating-action-button" @click="openModal">+</button>
     <div class="container">
