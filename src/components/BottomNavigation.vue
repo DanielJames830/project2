@@ -8,8 +8,14 @@
     </RouterLink>
     <RouterLink to="/parks" class="nav-item" active-class="active">
       <div class="nav-item">
-        <font-awesome-icon :icon="['fas', 'map']" />
+        <font-awesome-icon :icon="['fas', 'tree']" />
         <p>Parks</p>
+      </div>
+    </RouterLink>
+    <RouterLink to="/trips" class="nav-item" active-class="active">
+      <div class="nav-item">
+        <font-awesome-icon :icon="['fas', 'map']" />
+        <p>Trips</p>
       </div>
     </RouterLink>
     <RouterLink to="/friends" class="nav-item" active-class="active">

@@ -1,9 +1,8 @@
 import { useUserStore } from '@/stores/user';
 
-const userStore = useUserStore();
-const token = userStore.token;
-
 export async function fetchExcursions() {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = 'https://excursions-api-server.azurewebsites.net/excursions';
     const response = await fetch(url, {
         method: 'GET',
@@ -18,6 +17,8 @@ export async function fetchExcursions() {
 }
 
 export async function createExcursion(excursionData) {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = 'https://excursions-api-server.azurewebsites.net/excursion';
     const response = await fetch(url, {
         method: 'POST',
@@ -33,6 +34,8 @@ export async function createExcursion(excursionData) {
 }
 
 export async function fetchExcursionById(excursionId) {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = `https://excursions-api-server.azurewebsites.net/excursion/${excursionId}`;
     const response = await fetch(url, {
         method: 'GET',
@@ -47,6 +50,8 @@ export async function fetchExcursionById(excursionId) {
 }
 
 export async function updateExcursionById(excursionId, updateData) {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = `https://excursions-api-server.azurewebsites.net/excursion/${excursionId}`;
     const response = await fetch(url, {
         method: 'PATCH',
@@ -62,6 +67,8 @@ export async function updateExcursionById(excursionId, updateData) {
 }
 
 export async function deleteExcursionById(excursionId) {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = `https://excursions-api-server.azurewebsites.net/excursion/${excursionId}`;
     const response = await fetch(url, {
         method: 'DELETE',
@@ -72,10 +79,17 @@ export async function deleteExcursionById(excursionId) {
         throw new Error('Failed to delete excursion');
     }
 
-    return await response.json();
+    const text = await response.text();
+    if (text) {
+        return JSON.parse(text);
+    }
+
+    return {}
 }
 
 export async function shareExcursion(excursionId, inviteData) {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = `https://excursions-api-server.azurewebsites.net/share/excursion/${excursionId}`;
     const response = await fetch(url, {
         method: 'POST',
@@ -91,6 +105,8 @@ export async function shareExcursion(excursionId, inviteData) {
 }
 
 export async function fetchSharedExcursions() {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = 'https://excursions-api-server.azurewebsites.net/share/excursions';
     const response = await fetch(url, {
         method: 'GET',
@@ -105,6 +121,8 @@ export async function fetchSharedExcursions() {
 }
 
 export async function handleExcursionInvite(inviteId, actionData) {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = `https://excursions-api-server.azurewebsites.net/share/excursions/${inviteId}`;
     const response = await fetch(url, {
         method: 'PATCH',
@@ -120,6 +138,8 @@ export async function handleExcursionInvite(inviteId, actionData) {
 }
 
 export async function deleteExcursionInvite(inviteId) {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = `https://excursions-api-server.azurewebsites.net/share/excursions/${inviteId}`;
     const response = await fetch(url, {
         method: 'DELETE',
@@ -134,6 +154,8 @@ export async function deleteExcursionInvite(inviteId) {
 }
 
 export async function removeUserFromExcursion(excursionId) {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = `https://excursions-api-server.azurewebsites.net/remove/excursions/${excursionId}`;
     const response = await fetch(url, {
         method: 'DELETE',
@@ -148,6 +170,8 @@ export async function removeUserFromExcursion(excursionId) {
 }
 
 export async function leaveExcursion(excursionId) {
+    const userStore = useUserStore();
+    const token = userStore.token;
     const url = `https://excursions-api-server.azurewebsites.net/leave/excursions/${excursionId}`;
     const response = await fetch(url, {
         method: 'DELETE',

@@ -39,8 +39,34 @@
                         <multiselect id="campground" v-model="editableTrip.campground" :options="campgroundOptions"
                             :multiple="false" :close-on-select="true" :clear-on-select="true" :preserve-search="true"
                             placeholder="Select a campground" label="name" track-by="id" :disabled="!isEditing" />
+
+
+                    </div>
+                    <div class="campground-info" v-if="editableTrip.campground">
+                        <div id="campground-details">
+                            <h1>{{ editableTrip.campground.name }}</h1>
+
+                            <p>{{ editableTrip.campground.description }}</p>
+                            <p>
+                                <strong>Coordinates:</strong>
+                                {{ editableTrip.campground.latitude }}, {{ editableTrip.campground.longitude }}
+                            </p>
+                            <p>
+                                <a :href="editableTrip.campground.url" target="_blank">Official NPS Page</a>
+                            </p>
+
+                            <section>
+                                <h2>Reservation</h2>
+                                <p>{{ editableTrip.campground.reservationInfo }}</p>
+                                <p v-if="editableTrip.campground.reservationUrl">
+                                    <a :href="editableTrip.campground.reservationUrl" target="_blank">Reserve
+                                        Now</a>
+                                </p>
+                            </section>
+                        </div>
                     </div>
                 </div>
+
 
                 <!-- Page 3 -->
                 <div v-show="page === 2">
@@ -316,6 +342,12 @@ async function saveChanges() {
 
 .page-indicator span.active {
     background: #21272a;
+}
+
+.campground-info {
+    max-height: 400px;
+    overflow-y: auto;
+
 }
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

@@ -96,6 +96,7 @@ export async function updateTripById(tripId, tripData) {
 }
 
 export async function deleteTripById(tripId) {
+    console.log(tripId);
     const userStore = useUserStore();
     const token = userStore.token;
 
@@ -109,5 +110,10 @@ export async function deleteTripById(tripId) {
         throw new Error('Failed to delete trip');
     }
 
-    return await response.json();
+
+    const text = await response.text();
+    if (text) {
+        return JSON.parse(text);
+    }
+    return {};
 }

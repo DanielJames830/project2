@@ -1,19 +1,28 @@
 <template>
-  <div class="page">
-
+  <div class="container">
+    <h1>Your Excursions</h1>
     <button class="floating-action-button" @click="openModal">+</button>
-    <div class="container">
-      <h1>Excursions</h1>
-      <p>Explore the world with us!</p>
-      <div class="excursion-list">
-        <div class="excursion-item" v-for="excursion in excursions" :key="excursion.id">
-          <h2>{{ excursion.name }}</h2>
-          <p>{{ excursion.description }}</p>
-          <button @click="bookExcursion(excursion.id)">View Details</button>
+    <div v-if="loading" class="loading">Loading...</div>
+    <div v-else-if="excursions.length === 0" class="no-results">No excursions found.</div>
+    <div v-else class="excursion-list">
+      <div class="excursion-item" v-for="excursion in excursions" :key="excursion.id" @click="openExcursion(excursion)">
+        <h2>{{ excursion.name }}</h2>
+        <p>{{ excursion.description }}</p>
+      </div>
+    </div>
+
+    <!-- Excursion Details Modal -->
+    <div v-if="viewExcursion" class="modal-overlay" @click.self="closeExcursionModal">
+      <div class="modal-content">
+        <h2>{{ viewExcursion.name }}</h2>
+        <p>{{ viewExcursion.description }}</p>
+        <div class="modal-actions">
+          <button @click="closeExcursionModal">Close</button>
         </div>
       </div>
     </div>
 
+    <!-- New Excursion Modal -->
     <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
       <div class="modal-content">
         <h2>New Excursion</h2>
@@ -36,41 +45,54 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import TitleBar from '@/components/TitleBar.vue';
 import { fetchExcursions, createExcursion } from '@/services/excursions';
 
 const excursions = ref([]);
+const loading = ref(true);
 const showModal = ref(false);
+const viewExcursion = ref(null);
 const newExcursion = ref({
   name: '',
   description: '',
 });
 
 async function loadExcursions() {
+  loading.value = true;
   try {
     const data = await fetchExcursions();
-    excursions.value = data.excursions;
+    excursions.value = data.excursions || data;
   } catch (error) {
+    excursions.value = [];
     console.error('Error fetching excursions:', error.message);
   }
+  loading.value = false;
 }
 
 async function submitForm() {
   try {
     await createExcursion(newExcursion.value);
     closeModal();
-    loadExcursions();
+    await loadExcursions();
   } catch (error) {
     console.error('Error creating excursion:', error.message);
   }
 }
 
 function openModal() {
+  newExcursion.value = { name: '', description: '' };
   showModal.value = true;
 }
 
 function closeModal() {
   showModal.value = false;
+}
+
+function openExcursion(excursion) {
+  viewExcursion.value = excursion;
+}
+
+function closeExcursionModal() {
+  viewExcursion.value = null;
 }
 
 onMounted(loadExcursions);
@@ -100,6 +122,32 @@ onMounted(loadExcursions);
   box-shadow: 0px 3px 0px rgba(0, 0, 0, 0.566);
   z-index: 1000;
   padding: 20px;
+}
+
+.excursion-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.excursion-item {
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  padding: 1rem;
+  cursor: pointer;
+  background: #f8f8f8;
+  transition: background 0.2s;
+}
+
+.excursion-item:hover {
+  background: #ffe6b0;
+}
+
+.loading,
+.no-results {
+  margin: 2rem 0;
+  color: #888;
+  text-align: center;
 }
 
 /* Modal styles */
@@ -138,5 +186,28 @@ onMounted(loadExcursions);
   width: 100%;
   padding: 0.5rem;
   box-sizing: border-box;
+}
+
+.modal-actions {
+  margin-top: 1.5rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+}
+
+.modal-actions button {
+  background-color: #21272a;
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.modal-actions button:hover {
+  background-color: #FFC15E;
+  color: #21272a;
 }
 </style>
