@@ -26,6 +26,7 @@
 import { ref } from 'vue';
 import { useUserStore } from '@/stores/user';
 import { useRouter } from 'vue-router';
+import { signIn } from '@/services/users';
 
 export default {
   name: 'SignIn',
@@ -37,14 +38,7 @@ export default {
 
     const onSubmit = async () => {
       try {
-        const response = await fetch('https://excursions-api-server.azurewebsites.net/user/sign-in', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: email.value, password: password.value })
-        });
-
-        const responseData = await response.json();
-        if (!response.ok) throw new Error(responseData.message || 'Sign-in failed');
+        const responseData = await signIn(email.value, password.value);
 
         userStore.$patch({
           email: responseData.email,

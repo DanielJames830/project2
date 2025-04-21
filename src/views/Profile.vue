@@ -13,7 +13,7 @@
           <p>No user data found.</p>
         </div>
         <button @click="openDialog">Edit</button>
-        <button @click="deleteUser">Delete</button>
+        <button @click="handleDeleteUser">Delete</button>
       </div>
     </div>
 
@@ -32,100 +32,39 @@
 </template>
 
 <script setup>
-import { useUserStore } from '@/stores/user';
 import { ref, onMounted, useTemplateRef } from 'vue';
+import { useUserStore } from '@/stores/user';
+import { useRouter } from 'vue-router';
+import { fetchUser, deleteUser } from '@/services/users';
 import EditForm from '@/components/EditForm.vue';
 import TitleBar from '@/components/TitleBar.vue';
-import { useRouter } from 'vue-router';
+
 const router = useRouter();
-const message = ref('')
-
-const nameDialog = ref(null);
-
-const form = useTemplateRef('form');
-
-function openDialog() {
-  nameDialog.value.showModal();
-}
-
-function cancel() {
-  message.value = 'Cancelled';
-  name.value = '';
-  nameDialog.value.close();
-}
-
-async function save() {
-  message.value = 'Saved ' + name.value;
-  name.value = '';
-  await form.value.edit();
-  await getUser();
-  nameDialog.value.close();
-}
-
-
 const userStore = useUserStore();
-const token = userStore.token;
-
-
-const name = ref('');
+const nameDialog = ref(null);
+const form = useTemplateRef('form');
 const user = ref(null);
 
 async function getUser() {
-  const url = "https://excursions-api-server.azurewebsites.net/user";
-  const options = {
-    method: "GET",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-  };
   try {
-    const response = await fetch(url, options);
-    const responseData = await response.json();
-
-    if (!response.ok) {
-      serverResponse.value = response.status;
-      console.error("Get failed:", responseData || "Unknown error");
-      errorMessage.value = responseData.message || "An error occurred.";
-      return;
-    }
-
-    console.log("Found User:", responseData);
+    const responseData = await fetchUser();
     user.value = responseData.user;
-    console.log(user.value)
-
   } catch (error) {
-    console.error("An error occurred while submitting the form:", error);
+    console.error('Error fetching user:', error.message);
   }
 }
 
-onMounted(async () => {
-
-  await getUser();
-});
-
-
-async function deleteUser(e) {
-  const url = "https://excursions-api-server.azurewebsites.net/user";
-  const token = userStore.token;
-
-  const options = {
-    method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-
-  }
-
-  let response = await fetch(url, options);
-
-  if (response.ok) {
+async function handleDeleteUser() {
+  try {
+    await deleteUser();
     userStore.$reset();
     router.push({ name: 'home' });
-  } else {
-    alert("Unable to delete account");
+  } catch (error) {
+    alert('Unable to delete account');
   }
-
-
 }
 
+onMounted(getUser);
 </script>
 
 <style scoped>

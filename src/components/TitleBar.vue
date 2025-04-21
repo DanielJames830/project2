@@ -52,11 +52,15 @@ async function signOut(e) {
     top: 0;
     left: 0;
     width: 100%;
+    height: 60px;
+    /* Set a fixed height */
     display: flex;
     justify-content: space-around;
     background: #ffffff;
     padding: 10px 0;
     box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    /* Ensure it stays above other content */
 }
 
 h1 {

@@ -38,17 +38,33 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import TitleBar from '@/components/TitleBar.vue';
-import { useUserStore } from '@/stores/user';
+import { fetchExcursions, createExcursion } from '@/services/excursions';
 
-const userStore = useUserStore();
-const token = userStore.token;
-
+const excursions = ref([]);
 const showModal = ref(false);
-
 const newExcursion = ref({
   name: '',
-  description: ''
+  description: '',
 });
+
+async function loadExcursions() {
+  try {
+    const data = await fetchExcursions();
+    excursions.value = data.excursions;
+  } catch (error) {
+    console.error('Error fetching excursions:', error.message);
+  }
+}
+
+async function submitForm() {
+  try {
+    await createExcursion(newExcursion.value);
+    closeModal();
+    loadExcursions();
+  } catch (error) {
+    console.error('Error creating excursion:', error.message);
+  }
+}
 
 function openModal() {
   showModal.value = true;
@@ -58,69 +74,7 @@ function closeModal() {
   showModal.value = false;
 }
 
-async function getExcursions() {
-  const url = "https://excursions-api-server.azurewebsites.net/excursions";
-
-  const response = await fetch(url, {
-    method: 'GET',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    }
-  });
-
-
-
-  if (!response.ok) {
-    console.error('Error fetching excursions:', response.statusText);
-    return;
-  }
-
-  const data = await response.json();
-
-  return data;
-}
-
-const excursions = ref([]);
-async function fetchExcursions() {
-  const data = await getExcursions();
-  if (data) {
-    excursions.value = data['excursions'];
-  }
-}
-onMounted(() => {
-  fetchExcursions();
-});
-
-async function submitForm() {
-
-  const url = "https://excursions-api-server.azurewebsites.net/excursion";
-
-  const data = {
-    name: newExcursion.value.name,
-    description: newExcursion.value.description,
-    trips: [],
-  };
-
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${token}`
-    },
-    body: JSON.stringify(data)
-  });
-
-  if (!response.ok) {
-    console.error('Error creating excursion:', response.statusText);
-    return;
-  }
-
-
-  closeModal();
-}
-
-
+onMounted(loadExcursions);
 </script>
 
 <style scoped>

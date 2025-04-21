@@ -17,8 +17,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Adjust to prevent overlap */
   margin: 0;
+  padding-top: 60px; /* Match TitleBar height */
+  padding-bottom: 80px; /* Match BottomNavigation height */
 }
 
 label {

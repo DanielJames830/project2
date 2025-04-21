@@ -4,30 +4,44 @@
             <h2 v-if="!isEditing">{{ trip.name }}</h2>
             <div v-else>
                 <label for="name">Name</label>
-                <input id="name" v-model="editableTrip.name" />
+                <input id="name" v-model="editableTrip.name" required />
             </div>
 
             <p v-if="!isEditing">{{ trip.description }}</p>
             <div v-else>
                 <label for="description">Description</label>
-                <textarea id="description" v-model="editableTrip.description"></textarea>
+                <textarea id="description" v-model="editableTrip.description" required></textarea>
             </div>
 
-            <div class="date-list" v-if="isEditing">
+            <div>
                 <label for="startDate">Start Date</label>
-                <input id="startDate" type="date" v-model="editableTrip.startDate"
-                    @change="updateDate('startDate', editableTrip.startDate)" />
+                <input id="startDate" type="datetime-local" v-model="editableTrip.startDate" required />
+            </div>
 
+            <div>
                 <label for="endDate">End Date</label>
-                <input id="endDate" type="date" v-model="editableTrip.endDate"
-                    @change="updateDate('endDate', editableTrip.endDate)" />
+                <input id="endDate" type="datetime-local" v-model="editableTrip.endDate" required />
+            </div>
+
+            <div>
+                <label for="park">Park</label>
+                <input id="park" v-model="editableTrip.park" placeholder="Enter Park ID" />
+            </div>
+
+            <div>
+                <label for="campground">Campground</label>
+                <input id="campground" v-model="editableTrip.campground" placeholder="Enter Campground ID" />
+            </div>
+
+            <div>
+                <label for="thingstodo">Things To Do</label>
+                <textarea id="thingstodo" v-model="editableTrip.thingstodo"
+                    placeholder="Comma-separated IDs"></textarea>
             </div>
 
             <div class="modal-actions">
-                <button v-if="!props.new && !isEditing" @click="enableEditing">Edit</button>
-                <button v-if="!props.new && isEditing" @click="saveChanges">Save</button>
-                <button v-if="!props.new" @click="deleteTrip">Delete</button>
                 <button v-if="props.new" @click="createTrip(editableTrip)">Create</button>
+                <button v-else-if="isEditing" @click="saveChanges">Save</button>
                 <button @click="$emit('close')">Close</button>
             </div>
         </div>
@@ -60,37 +74,16 @@ const token = userStore.token;
 watch(
     () => props.trip,
     (newVal) => {
-        editableTrip.value = { ...newVal };
+        editableTrip.value = {
+            ...newVal,
+            thingstodo: Array.isArray(newVal.thingstodo) ? newVal.thingstodo.join(', ') : ''
+        };
     }
 );
 
-function enableEditing() {
-    isEditing.value = true;
-}
-
-async function deleteTrip() {
-    const url = `https://excursions-api-server.azurewebsites.net/trip/${props.trip._id}`;
-    const options = {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        }
-    };
-
-    const response = await fetch(url, options);
-    if (!response.ok) {
-        console.error('Error deleting trip:', response.statusText);
-        return;
-    }
-
-    emit('delete');
-}
-
 async function createTrip(newData) {
+    newData.thingstodo = newData.thingstodo.split(',').map(id => id.trim());
     const url = "https://excursions-api-server.azurewebsites.net/trip";
-
-    console.log('Creating trip with data:', JSON.stringify(newData));
 
     const response = await fetch(url, {
         method: 'POST',
@@ -100,6 +93,7 @@ async function createTrip(newData) {
         },
         body: JSON.stringify(newData)
     });
+
     if (!response.ok) {
         console.error('Error creating trip:', response.statusText);
         return;
@@ -117,18 +111,20 @@ async function saveChanges() {
         description: editableTrip.value.description,
         startDate: editableTrip.value.startDate,
         endDate: editableTrip.value.endDate,
+        park: editableTrip.value.park,
+        campground: editableTrip.value.campground,
+        thingstodo: editableTrip.value.thingstodo.split(',').map(id => id.trim())
     };
 
-    const options = {
+    const response = await fetch(url, {
         method: 'PATCH',
         headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(data)
-    };
+    });
 
-    const response = await fetch(url, options);
     if (!response.ok) {
         console.error('Error updating trip:', response.statusText);
         return;
@@ -137,11 +133,6 @@ async function saveChanges() {
     emit('update', editableTrip.value);
     isEditing.value = false;
 }
-
-function updateDate(field, value) {
-    editableTrip.value[field] = value;
-}
-
 </script>
 
 <style scoped>
@@ -170,9 +161,5 @@ function updateDate(field, value) {
     margin-top: 1.5rem;
     display: flex;
     gap: 1rem;
-}
-
-.date-list {
-    margin-top: 1rem;
 }
 </style>
