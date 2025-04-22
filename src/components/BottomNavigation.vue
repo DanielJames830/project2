@@ -18,12 +18,12 @@
         <p>Trips</p>
       </div>
     </RouterLink>
-    <RouterLink to="/friends" class="nav-item" active-class="active">
+    <!-- <RouterLink to="/friends" class="nav-item" active-class="active">
       <div class="nav-item">
         <font-awesome-icon :icon="['fas', 'users']" />
         <p>Friends</p>
       </div>
-    </RouterLink>
+    </RouterLink> -->
     <RouterLink to="/profile" class="nav-item" active-class="active">
       <font-awesome-icon :icon="['fas', 'user']" />
       <p>Profile</p>

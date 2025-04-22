@@ -1,10 +1,10 @@
 <template>
   <div class="page">
-
     <div class="profile-container">
       <div class="profile-body">
-        <h1 v-if="user"> {{ user.firstName }} {{ user.lastName }}</h1>
+        <h1 v-if="user">{{ user.firstName }} {{ user.lastName }}</h1>
         <h1 v-else>Loading...</h1>
+
         <div v-if="user">
           <p><strong>Username:</strong> {{ user.userName }}</p>
           <p><strong>Email:</strong> {{ user.email }}</p>
@@ -12,53 +12,70 @@
         <div v-else>
           <p>No user data found.</p>
         </div>
-        <button @click="openDialog">Edit</button>
-        <button @click="handleDeleteUser">Delete</button>
+
+        <button @click="openDialog" class="btn-secondary">Edit</button>
+        <button @click="handleDeleteUser" class="btn-danger">Delete</button>
       </div>
     </div>
 
-
     <dialog ref="nameDialog">
-      <form method="dialog" class="dialog-content">
-        <h1 class="primary-heading">Edit Profile</h1>
-        <EditForm ref="form"></EditForm>
+      <div class="dialog-content">
+        <h2 class="primary-heading">Edit Profile</h2>
+        <EditForm ref="editForm" />
         <div class="dialog-footer">
-          <button type="button" @click="cancel">Cancel</button>
-          <button type="button" @click="save">Save</button>
+          <button @click="cancel" type="button">Cancel</button>
+          <button @click="save" type="button">Save</button>
         </div>
-      </form>
+      </div>
     </dialog>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, useTemplateRef, reactive } from 'vue';
-import { useUserStore } from '@/stores/user';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { fetchUser, deleteUser, updateUser } from '@/services/users';
+import { useUserStore } from '@/stores/user';
+import { fetchUser, deleteUser } from '@/services/users';
 import EditForm from '@/components/EditForm.vue';
-import TitleBar from '@/components/TitleBar.vue';
 
 const router = useRouter();
 const userStore = useUserStore();
+
 const nameDialog = ref(null);
-const form = useTemplateRef('form');
+const editForm = ref(null);
 const user = ref(null);
 
-const formData = reactive({
-  firstName: '',
-  lastName: '',
-  userName: '',
-  email: ''
-});
-
+// Fetch current user on mount
 async function getUser() {
   try {
-    const responseData = await fetchUser();
-    user.value = responseData.user;
-  } catch (error) {
-    console.error('Error fetching user:', error.message);
+    const { user: fetched } = await fetchUser();
+    user.value = fetched;
+  } catch (err) {
+    console.error('Error fetching user:', err);
   }
+}
+
+function openDialog() {
+  if (nameDialog.value) nameDialog.value.showModal();
+}
+
+async function save() {
+  if (!editForm.value) return;
+  try {
+    const updated = await editForm.value.submitEdit();
+    // Only close if update succeeded
+    if (updated) {
+      user.value = { ...user.value, ...updated };
+      nameDialog.value.close();
+    }
+  } catch (err) {
+    console.error('Error updating user:', err);
+    // Leave dialog open so user can correct errors
+  }
+}
+
+function cancel() {
+  if (nameDialog.value) nameDialog.value.close();
 }
 
 async function handleDeleteUser() {
@@ -66,34 +83,8 @@ async function handleDeleteUser() {
     await deleteUser();
     userStore.$reset();
     router.push({ name: 'home' });
-  } catch (error) {
+  } catch {
     alert('Unable to delete account');
-  }
-}
-
-function openDialog() {
-  if (nameDialog.value) {
-    formData.firstName = user.value.firstName;
-    formData.lastName = user.value.lastName;
-    formData.userName = user.value.userName;
-    formData.email = user.value.email;
-    nameDialog.value.showModal();
-  }
-}
-
-async function save() {
-  try {
-    await updateUser(formData);
-    user.value = { ...user.value, ...formData };
-    nameDialog.value.close();
-  } catch (error) {
-    console.error('Error updating user:', error.message);
-  }
-}
-
-function cancel() {
-  if (nameDialog.value) {
-    nameDialog.value.close();
   }
 }
 
@@ -105,7 +96,6 @@ onMounted(getUser);
   background-color: white;
   padding: 2rem;
   border-radius: 30px;
-
 }
 
 .dialog-content {
@@ -113,12 +103,39 @@ onMounted(getUser);
   border: none;
   background: white;
   border-radius: 8px;
-  min-width: 300px;
+  min-width: 320px;
 }
 
 .dialog-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 1rem;
   margin-top: 1rem;
+}
+
+.btn-secondary {
+  background-color: #6b7280;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-danger {
+  background-color: #dc2626;
+  color: white;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
 }
 </style>

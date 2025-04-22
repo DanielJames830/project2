@@ -343,11 +343,5 @@ async function saveChanges() {
 .page-indicator span.active {
     background: #21272a;
 }
-
-.campground-info {
-    max-height: 400px;
-    overflow-y: auto;
-
-}
 </style>
 <style src="vue-multiselect/dist/vue-multiselect.min.css"></style>

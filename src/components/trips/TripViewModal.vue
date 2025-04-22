@@ -15,14 +15,18 @@
             </div>
             <div class="modal-actions">
                 <button @click="$emit('delete', trip)">Delete</button>
+                <button @click="$emit('edit', trip)">Edit</button>
                 <button @click="$emit('close')">Close</button>
             </div>
         </div>
     </div>
+
+    <TripEditModal />
 </template>
 
 <script setup>
 import { deleteTripById } from '@/services/trips';
+import TripEditModal from './TripEditModal.vue';
 
 const props = defineProps({
     trip: { type: Object, required: true },
@@ -31,7 +35,8 @@ const props = defineProps({
     thingsToDo: { type: Array, default: () => [] }
 });
 
-const emit = defineEmits(['close', 'delete']);
+const emit = defineEmits(['close', 'delete', 'edit']);
+const isEditing = ref(false);
 
 function formatDate(dateStr) {
     if (!dateStr) return '';

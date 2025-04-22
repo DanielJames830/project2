@@ -2,24 +2,12 @@
   <div class="container">
     <h1>Your Excursions</h1>
     <button class="floating-action-button" @click="openModal">+</button>
+
     <div v-if="loading" class="loading">Loading...</div>
     <div v-else-if="excursions.length === 0" class="no-results">No excursions found.</div>
     <div v-else class="excursion-list">
-      <div class="excursion-item" v-for="excursion in excursions" :key="excursion.id" @click="openExcursion(excursion)">
-        <h2>{{ excursion.name }}</h2>
-        <p>{{ excursion.description }}</p>
-      </div>
-    </div>
-
-    <!-- Excursion Details Modal -->
-    <div v-if="viewExcursion" class="modal-overlay" @click.self="closeExcursionModal">
-      <div class="modal-content">
-        <h2>{{ viewExcursion.name }}</h2>
-        <p>{{ viewExcursion.description }}</p>
-        <div class="modal-actions">
-          <button @click="closeExcursionModal">Close</button>
-        </div>
-      </div>
+      <ExcursionItem v-for="excursion in excursions" :key="excursion._id" :excursion="excursion"
+        :formatDate="formatDate" @updated="loadExcursions" />
     </div>
 
     <!-- New Excursion Modal -->
@@ -35,8 +23,16 @@
             <label for="description">Description</label>
             <textarea id="description" v-model="newExcursion.description" required></textarea>
           </div>
-          <button type="submit">Submit</button>
-          <button type="button" @click="closeModal">Cancel</button>
+          <div class="form-group">
+            <label for="trips">Trips</label>
+            <Multiselect id="trips" v-model="newExcursion.trips" :options="tripOptions" :multiple="true"
+              :close-on-select="false" :clear-on-select="false" :preserve-search="true" placeholder="Select trips"
+              label="name" track-by="_id" />
+          </div>
+          <div class="modal-actions">
+            <button type="submit">Submit</button>
+            <button type="button" @click="closeModal">Cancel</button>
+          </div>
         </form>
       </div>
     </div>
@@ -46,26 +42,44 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { fetchExcursions, createExcursion } from '@/services/excursions';
+import { fetchTrips } from '@/services/trips';
+import Multiselect from 'vue-multiselect';
+import ExcursionItem from '@/components/excursions/ExcursionItem.vue';
 
 const excursions = ref([]);
 const loading = ref(true);
 const showModal = ref(false);
-const viewExcursion = ref(null);
-const newExcursion = ref({
-  name: '',
-  description: '',
-});
+const newExcursion = ref({ name: '', description: '', trips: [] });
+const tripOptions = ref([]);
+
+function formatDate(dateStr) {
+  return dateStr ? new Date(dateStr).toLocaleString() : '';
+}
 
 async function loadExcursions() {
   loading.value = true;
   try {
     const data = await fetchExcursions();
     excursions.value = data.excursions || data;
-  } catch (error) {
+  } catch {
     excursions.value = [];
-    console.error('Error fetching excursions:', error.message);
   }
   loading.value = false;
+}
+
+async function openModal() {
+  newExcursion.value = { name: '', description: '', trips: [] };
+  showModal.value = true;
+  try {
+    const tripsData = await fetchTrips();
+    tripOptions.value = Array.isArray(tripsData.trips) ? tripsData.trips : [];
+  } catch {
+    tripOptions.value = [];
+  }
+}
+
+function closeModal() {
+  showModal.value = false;
 }
 
 async function submitForm() {
@@ -73,30 +87,14 @@ async function submitForm() {
     await createExcursion(newExcursion.value);
     closeModal();
     await loadExcursions();
-  } catch (error) {
-    console.error('Error creating excursion:', error.message);
+  } catch (e) {
+    console.error('Error creating excursion:', e.message);
   }
-}
-
-function openModal() {
-  newExcursion.value = { name: '', description: '' };
-  showModal.value = true;
-}
-
-function closeModal() {
-  showModal.value = false;
-}
-
-function openExcursion(excursion) {
-  viewExcursion.value = excursion;
-}
-
-function closeExcursionModal() {
-  viewExcursion.value = null;
 }
 
 onMounted(loadExcursions);
 </script>
+
 
 <style scoped>
 .container {
@@ -106,6 +104,7 @@ onMounted(loadExcursions);
 }
 
 .floating-action-button {
+  color: #21272a;
   font-size: xx-large;
   border-radius: 100%;
   width: 60px;
@@ -130,8 +129,14 @@ onMounted(loadExcursions);
   gap: 1rem;
 }
 
+.trip-list {
+  height: 300px;
+  overflow-y: auto;
+}
+
 .excursion-item {
   border: 1px solid #ccc;
+  width: 300px;
   border-radius: 10px;
   padding: 1rem;
   cursor: pointer;
