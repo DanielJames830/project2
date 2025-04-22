@@ -5,7 +5,7 @@
         <div v-else-if="trips.length === 0" class="no-results">No trips found.</div>
         <div v-else class="trip-list">
             <TripItem v-for="trip in trips" :key="trip._id" :trip="trip" :formatDate="formatDate"
-                @deleted="loadTrips" />
+                @deleted="loadTrips" @updated="loadTrips"/>
         </div>
     </div>
 </template>

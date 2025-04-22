@@ -102,7 +102,7 @@
 <script setup>
 import { ref, watch, onMounted } from 'vue';
 import { useUserStore } from '@/stores/user';
-import { createTrip } from '@/services/trips';
+import { createTrip, updateTripById } from '@/services/trips';
 import Multiselect from 'vue-multiselect';
 import { fetchCampgrounds, fetchThingsToDo } from '@/services/nationalParks';
 
@@ -120,7 +120,11 @@ const props = defineProps({
 const emit = defineEmits(['close', 'update', 'delete']);
 
 const isEditing = ref(props.new);
-const editableTrip = ref({ ...props.trip });
+const editableTrip = ref({
+    ...props.trip,
+    startDate: props.trip.startDate ? props.trip.startDate.slice(0, 16) : '',
+    endDate: props.trip.endDate ? props.trip.endDate.slice(0, 16) : ''
+});
 const page = ref(0);
 
 const userStore = useUserStore();
@@ -203,29 +207,21 @@ watch(
 );
 
 async function saveChanges() {
-    const url = `https://excursions-api-server.azurewebsites.net/trip/${props.trip._id}`;
-
     const data = {
         name: editableTrip.value.name,
         description: editableTrip.value.description,
-        startDate: editableTrip.value.startDate,
-        endDate: editableTrip.value.endDate,
+        startDate: new Date(editableTrip.value.startDate).toISOString(),
+        endDate: new Date(editableTrip.value.endDate).toISOString(),
         park: editableTrip.value.park,
         campground: editableTrip.value.campground?.id || editableTrip.value.campground,
-        // Convert selected things to do objects to array of IDs
         thingstodo: Array.isArray(editableTrip.value.thingstodo)
             ? editableTrip.value.thingstodo.map(t => t.id)
             : []
     };
 
-    const response = await fetch(url, {
-        method: 'PATCH',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(data)
-    });
+    console.log(data);
+
+    const response = await updateTripById(props.trip._id, data)
 
     if (!response.ok) {
         console.error('Error updating trip:', response.statusText);
@@ -234,6 +230,7 @@ async function saveChanges() {
 
     emit('update', editableTrip.value);
     isEditing.value = false;
+    emit('close');
 }
 </script>
 

@@ -17,22 +17,22 @@
 
 
     <TripViewModal v-if="isModalOpen" :trip="trip" :park="viewPark" :campground="viewCampground"
-        :thingsToDo="viewThingsToDo" @close="closeModal" @delete="handleDelete" />
+        :thingsToDo="viewThingsToDo" @close="closeModal" @delete="handleDelete" @update="handleUpdate" />
 
 </template>
 
 <script setup>
 import { ref } from 'vue';
 import { fetchParks, fetchCampgrounds, fetchThingsToDo } from '@/services/nationalParks';
-import { deleteTripById } from '@/services/trips';
+
 import TripViewModal from './TripViewModal.vue';
-import TripEditModal from './TripEditModal.vue';
+
 
 const props = defineProps({
     trip: { type: Object, required: true },
     formatDate: { type: Function, required: true },
 });
-const emit = defineEmits(['deleted']);
+const emit = defineEmits(['deleted', 'update']);
 
 
 
@@ -89,12 +89,21 @@ function closeModal() {
 
 async function handleDelete() {
     try {
-        await deleteTripById(props.trip._id);
+
         closeModal();
         emit('deleted', props.trip);
     } catch {
         alert('Failed to delete trip.');
     }
+}
+
+async function handleUpdate() {
+  try {
+    closeModal();
+    emit('updated', props.trip);
+  } catch {
+    alert('Failed to update trip')
+  }
 }
 </script>
 

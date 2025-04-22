@@ -78,6 +78,17 @@ export async function fetchTripById(tripId) {
 }
 
 export async function updateTripById(tripId, tripData) {
+
+
+    const data = {
+      name: tripData.name,
+      description: tripData.description,
+      startDate: tripData.startDate,
+      endDate: tripData.endDate,
+    }
+
+    console.log(JSON.stringify(data))
+
     const userStore = useUserStore();
     const token = userStore.token;
 
@@ -85,7 +96,7 @@ export async function updateTripById(tripId, tripData) {
     const response = await fetch(url, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(tripData),
+        body: JSON.stringify(data),
     });
 
     if (!response.ok) {
