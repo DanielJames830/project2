@@ -1,13 +1,33 @@
 <template>
     <div class="excursion-item" @click="openModal">
-        <h2>{{ excursion.name }}</h2>
-        <p>{{ excursion.description }}</p>
+
+          <h2>{{ excursion.name }}</h2>
+          <p>{{ excursion.description }}</p>
+
+
+
     </div>
 
     <div v-if="isModalOpen" class="modal-overlay" @click.self="closeModal">
         <div class="modal-content">
+           <div v-if="!editing">
             <h2>{{ excursion.name }}</h2>
             <p>{{ excursion.description }}</p>
+           </div>
+
+            <div v-if="editing">
+          <h2>Edit Excursion</h2>
+          <form @submit.prevent="saveChanges">
+            <div class="form-group">
+                    <label for="name">Name</label>
+                    <input id="name" v-model="editableTrip.name" type="text"/>
+                </div>
+                <div class="form-group">
+                    <label for="description">Description</label>
+                    <textarea id="description" v-model="editableTrip.description"></textarea>
+                </div>
+          </form>
+        </div>
 
             <div class="trip-list">
                 <TripItem v-for="trip in excursion.trips" :key="trip._id" :trip="trip" :formatDate="formatDate"
@@ -16,6 +36,8 @@
 
             <div class="modal-actions">
                 <button @click="handleDelete">Delete</button>
+                <button v-if="!editing" @click="startEditing">Edit</button>
+                <button v-if="editing" @click="endEditing">Save</button>
                 <button @click="closeModal">Close</button>
             </div>
         </div>
@@ -25,7 +47,9 @@
 <script setup>
 import { ref } from 'vue';
 import TripItem from '@/components/trips/TripItem.vue';
-import { deleteExcursionById, handleExcursionInvite } from '@/services/excursions';
+import { deleteExcursionById, handleExcursionInvite, updateExcursionById } from '@/services/excursions';
+
+const editing = ref(false);
 
 const props = defineProps({
     excursion: { type: Object, required: true },
@@ -33,7 +57,20 @@ const props = defineProps({
 });
 const emit = defineEmits(['updated']);
 
+const editableTrip = ref({ ...props.excursion})
+
 const isModalOpen = ref(false);
+
+function startEditing() {
+editing.value = true;
+}
+
+async function endEditing() {
+  await updateExcursionById(props.excursion._id, editableTrip.value)
+  emit('updated');
+
+  emit('close');
+}
 
 function openModal() {
     isModalOpen.value = true;
@@ -44,7 +81,7 @@ function closeModal() {
 }
 
 function onTripDeleted(trip) {
-    emit('updated');
+    emit('deleted');
 }
 
 async function handleDelete() {

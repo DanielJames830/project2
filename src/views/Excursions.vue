@@ -7,7 +7,7 @@
     <div v-else-if="excursions.length === 0" class="no-results">No excursions found.</div>
     <div v-else class="excursion-list">
       <ExcursionItem v-for="excursion in excursions" :key="excursion._id" :excursion="excursion"
-        :formatDate="formatDate" @updated="loadExcursions" />
+        :formatDate="formatDate" @updated="loadExcursions" @deleted="loadExcursions"/>
     </div>
 
     <!-- New Excursion Modal -->

@@ -50,13 +50,19 @@ export async function fetchExcursionById(excursionId) {
 }
 
 export async function updateExcursionById(excursionId, updateData) {
+
+  const data = {
+    name: updateData.name,
+    description: updateData.description
+  }
+
     const userStore = useUserStore();
     const token = userStore.token;
     const url = `https://excursions-api-server.azurewebsites.net/excursion/${excursionId}`;
     const response = await fetch(url, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify(updateData),
+        body: JSON.stringify(data),
     });
 
     if (!response.ok) {
